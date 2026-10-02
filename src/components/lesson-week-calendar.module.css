@@ -1,0 +1,399 @@
+.calendarCard,
+.dailyCard {
+  margin-top: 18px;
+  border: 1px solid #e2dbcf;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff, #fbf8f2);
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(35,49,59,.05);
+}
+
+.calendarHead,
+.dailyHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #a57b3d;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.calendarHead h2,
+.dailyHead h2 {
+  margin: 6px 0 0;
+  color: #15324a;
+  font-size: 22px;
+}
+
+.calendarHead p {
+  margin: 5px 0 0;
+  color: #758188;
+  font-size: 11px;
+}
+
+.calendarNav {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.calendarNav button {
+  min-width: 40px;
+  min-height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ddd5c8;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 11px;
+  color: #15324a;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.calendarLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 15px 0 10px;
+  color: #718087;
+  font-size: 9px;
+}
+
+.calendarLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.activityDot,
+.selectedDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.activityDot {
+  background: #17354c;
+}
+
+.selectedDot {
+  background: #d3ad69;
+}
+
+.weekLabels,
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.weekLabels {
+  margin-bottom: 6px;
+}
+
+.weekLabels span {
+  min-height: 26px;
+  display: grid;
+  place-items: center;
+  color: #899399;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.calendarDay,
+.emptyCalendarCell {
+  min-height: 68px;
+  border-radius: 13px;
+}
+
+.emptyCalendarCell {
+  border: 1px dashed rgba(222,216,205,.45);
+  background: rgba(247,244,238,.45);
+}
+
+.calendarDay {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  border: 1px solid #e5dfd6;
+  background: #fff;
+  padding: 8px;
+  color: #43535b;
+  font: inherit;
+  cursor: pointer;
+  transition: .16s ease;
+}
+
+.calendarDay:hover {
+  transform: translateY(-1px);
+  border-color: #ccb994;
+  box-shadow: 0 7px 16px rgba(35,49,59,.06);
+}
+
+.calendarDay strong {
+  font-size: 11px;
+}
+
+.calendarDay.hasActivity {
+  border-color: #17354c;
+  background: linear-gradient(145deg, #17354c, #244b61);
+  color: #fff;
+}
+
+.activityMarker {
+  border-radius: 999px;
+  background: #d9b878;
+  padding: 3px 6px;
+  color: #17354c;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.calendarDay.isSelected {
+  box-shadow:
+    0 0 0 3px rgba(211,173,105,.38),
+    0 9px 20px rgba(21,50,74,.12);
+}
+
+.calendarDay.isToday::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: 7px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #d9b878;
+}
+
+.dailyHead {
+  margin-bottom: 15px;
+}
+
+.dailyStats {
+  display: flex;
+  gap: 8px;
+}
+
+.dailyStats span {
+  min-width: 82px;
+  display: grid;
+  gap: 2px;
+  border-radius: 13px;
+  background: #f1ece4;
+  padding: 9px 11px;
+  color: #718087;
+  font-size: 8px;
+  text-align: center;
+}
+
+.dailyStats strong {
+  color: #15324a;
+  font-size: 18px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid #dcd4c8;
+  border-radius: 16px;
+}
+
+.dailyTable {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  background: #fffdf8;
+  font-size: 10px;
+}
+
+.dailyTable th {
+  border-bottom: 1px solid #d7c9ad;
+  background: #efbd34;
+  padding: 10px 11px;
+  color: #2d3438;
+  text-align: right;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.dailyTable td {
+  border-bottom: 1px solid #e8dfcf;
+  border-inline-start: 1px solid #e8dfcf;
+  padding: 10px 11px;
+  color: #394950;
+  vertical-align: middle;
+}
+
+.dailyTable td:first-child {
+  min-width: 102px;
+  background: #fff5cf;
+  color: #15324a;
+  font-variant-numeric: tabular-nums;
+}
+
+.dailyTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.dailyTable tbody tr:hover td {
+  background-color: #fffaf0;
+}
+
+.dailyTable tbody tr:hover td:first-child {
+  background-color: #ffefb3;
+}
+
+.statusBadge {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.scheduled {
+  background: #fff1c8;
+  color: #826126;
+}
+
+.completed {
+  background: #e7f2eb;
+  color: #47725b;
+}
+
+.cancelled {
+  background: #f5e7e5;
+  color: #914f49;
+}
+
+.cancelledRow {
+  opacity: .6;
+}
+
+.dailyEmpty {
+  border: 1px dashed #d9d0c2;
+  border-radius: 15px;
+  background: #faf8f4;
+  padding: 24px;
+  color: #7d878c;
+  text-align: center;
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .calendarCard,
+  .dailyCard {
+    border-radius: 19px;
+    padding: 14px 11px;
+  }
+
+  .calendarHead,
+  .dailyHead {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calendarHead h2,
+  .dailyHead h2 {
+    font-size: 18px;
+  }
+
+  .calendarNav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .weekLabels,
+  .monthGrid {
+    gap: 4px;
+  }
+
+  .calendarDay,
+  .emptyCalendarCell {
+    min-height: 55px;
+    border-radius: 10px;
+  }
+
+  .calendarDay {
+    padding: 6px;
+  }
+
+  .calendarDay:hover {
+    transform: none;
+  }
+
+  .activityMarker {
+    overflow: hidden;
+    max-width: 100%;
+    padding: 2px 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dailyStats {
+    width: 100%;
+  }
+
+  .dailyStats span {
+    flex: 1;
+  }
+}
+
+.dailyActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.exportButton {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #17354c;
+  border-radius: 12px;
+  background: #17354c;
+  padding: 0 14px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 7px 18px rgba(21,50,74,.12);
+  transition: transform .15s ease, background .15s ease;
+}
+
+.exportButton:hover {
+  transform: translateY(-1px);
+  background: #244b61;
+}
+
+@media (max-width: 720px) {
+  .dailyActions {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .exportButton {
+    width: 100%;
+    min-height: 44px;
+  }
+}
