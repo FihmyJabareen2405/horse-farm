@@ -1,0 +1,413 @@
+.calendarCard {
+  margin-top: 16px;
+  border: 1px solid #ded8cd;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #ffffff 0%, #fbf8f2 100%);
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(35, 49, 59, .055);
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 17px;
+}
+
+.kicker,
+.detailsKicker {
+  display: block;
+  color: #a57b3d;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .15em;
+}
+
+.calendarHeader h2 {
+  margin: 6px 0 0;
+  color: #15324a;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.monthNames {
+  margin: 5px 0 0;
+  color: #748087;
+  font-size: 11px;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  color: #68757c;
+  font-size: 10px;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #17354c;
+  box-shadow: 0 0 0 4px rgba(23,53,76,.08);
+}
+
+.weekHeader,
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.weekHeader {
+  margin-bottom: 7px;
+}
+
+.weekHeader span {
+  display: grid;
+  place-items: center;
+  min-height: 28px;
+  color: #8a9398;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.day,
+.emptyDay {
+  min-height: 76px;
+  border-radius: 15px;
+}
+
+.emptyDay {
+  border: 1px dashed rgba(222,216,205,.45);
+  background: rgba(247,244,238,.45);
+}
+
+.day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #e6e0d7;
+  background: #fff;
+  padding: 9px;
+  color: #344852;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform .14s ease,
+    border-color .14s ease,
+    box-shadow .14s ease,
+    background .14s ease;
+}
+
+.day:hover {
+  transform: translateY(-2px);
+  border-color: #cbb998;
+  box-shadow: 0 7px 16px rgba(35,49,59,.07);
+}
+
+.day:focus-visible {
+  outline: 3px solid rgba(198,162,105,.72);
+  outline-offset: 2px;
+}
+
+.dayNumber {
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.lessonDay {
+  border-color: #17354c;
+  background: linear-gradient(145deg, #17354c, #244c62);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(21,50,74,.14);
+}
+
+.today {
+  outline: 2px solid #c6a269;
+  outline-offset: 2px;
+}
+
+.selectedDay {
+  box-shadow:
+    0 0 0 3px rgba(198,162,105,.34),
+    0 10px 22px rgba(21,50,74,.12);
+}
+
+.lessonBadge {
+  width: max-content;
+  max-width: 100%;
+  align-self: flex-start;
+  border-radius: 999px;
+  background: #d9b878;
+  padding: 4px 7px;
+  color: #17354c;
+  font-size: 8px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.todayBadge {
+  position: absolute;
+  inset-inline-end: 7px;
+  top: 7px;
+  color: #a57b3d;
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.lessonDay .todayBadge {
+  color: #f0d29c;
+}
+
+.dayDetails {
+  margin-top: 18px;
+  border-top: 1px solid #e5ded3;
+  padding-top: 18px;
+}
+
+.dayDetailsHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.dayDetailsHeader h3 {
+  margin: 5px 0 0;
+  color: #15324a;
+  font-size: 18px;
+}
+
+.dayDetailsHeader p {
+  margin: 4px 0 0;
+  color: #7a858b;
+  font-size: 10px;
+}
+
+.activityCount {
+  flex: 0 0 auto;
+  color: #15324a;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.activityCount small {
+  color: #79848a;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.emptyActivity {
+  margin-top: 14px;
+  border: 1px dashed #d7cfc3;
+  border-radius: 15px;
+  background: #faf8f4;
+  padding: 18px;
+  color: #7a858b;
+  font-size: 11px;
+  text-align: center;
+}
+
+.activityList {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.activityCard {
+  border: 1px solid #e4ded4;
+  border-radius: 17px;
+  background: #fff;
+  padding: 14px;
+  box-shadow: 0 5px 18px rgba(35,49,59,.035);
+}
+
+.activityTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.activityTop > div {
+  display: grid;
+  gap: 4px;
+}
+
+.activityTop strong {
+  color: #344852;
+  font-size: 11px;
+}
+
+.activityTime {
+  color: #15324a;
+  font-size: 18px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.statusScheduled {
+  background: #eef2f4;
+  color: #35566a;
+}
+
+.statusCompleted {
+  background: #e8f1ec;
+  color: #49745d;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.detailsGrid > div {
+  min-width: 0;
+  border-radius: 12px;
+  background: #f5f1eb;
+  padding: 9px 10px;
+}
+
+.detailsGrid small {
+  display: block;
+  color: #8a9499;
+  font-size: 8px;
+}
+
+.detailsGrid strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 3px;
+  color: #15324a;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activityNote {
+  margin: 10px 0 0;
+  border-inline-start: 3px solid #cfaf78;
+  border-radius: 8px;
+  background: #fbf7ef;
+  padding: 8px 10px;
+  color: #657279;
+  font-size: 9px;
+  line-height: 1.65;
+}
+
+.activityNote strong {
+  color: #8b682f;
+}
+
+@media (max-width: 650px) {
+  .calendarCard {
+    margin-top: 10px;
+    border-radius: 20px;
+    padding: 14px 11px;
+  }
+
+  .calendarHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+
+  .calendarHeader h2 {
+    font-size: 19px;
+  }
+
+  .weekHeader,
+  .monthGrid {
+    gap: 4px;
+  }
+
+  .day,
+  .emptyDay {
+    min-height: 58px;
+    border-radius: 11px;
+  }
+
+  .day {
+    padding: 6px;
+  }
+
+  .day:hover {
+    transform: none;
+  }
+
+  .dayNumber {
+    font-size: 10px;
+  }
+
+  .lessonBadge {
+    overflow: hidden;
+    max-width: 100%;
+    padding: 3px 5px;
+    font-size: 7px;
+    text-overflow: ellipsis;
+  }
+
+  .todayBadge {
+    display: none;
+  }
+
+  .weekHeader span {
+    min-height: 23px;
+    font-size: 8px;
+  }
+
+  .dayDetails {
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+
+  .dayDetailsHeader {
+    align-items: flex-start;
+  }
+
+  .dayDetailsHeader h3 {
+    font-size: 16px;
+  }
+
+  .activityCount {
+    font-size: 23px;
+  }
+
+  .activityCard {
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .activityTop {
+    flex-direction: column;
+  }
+
+  .status {
+    align-self: flex-start;
+  }
+
+  .activityTime {
+    font-size: 17px;
+  }
+
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}

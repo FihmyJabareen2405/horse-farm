@@ -151,7 +151,7 @@ export function IntroVideoGate(){
   <video
    ref={videoRef}
    className={styles.video}
-   src="/video/abu-majed-intro.mp4"
+   src={mobile?'/video/abu-majed-intro-mobile.mp4':'/video/abu-majed-intro.mp4'}
    poster="/video/abu-majed-intro-poster.jpg"
    playsInline
    preload="metadata"

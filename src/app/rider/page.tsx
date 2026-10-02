@@ -1,6 +1,7 @@
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { SessionBar } from '@/components/session-bar';
+import { RiderMonthCalendar, type RiderCalendarActivity } from './rider-month-calendar';
 
 function formatDateTime(date: Date, timeZone: string) {
   return new Intl.DateTimeFormat('he-IL', {
@@ -10,10 +11,69 @@ function formatDateTime(date: Date, timeZone: string) {
   }).format(date);
 }
 
+function dateParts(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]),
+  );
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+  };
+}
+
+function timeZoneOffsetMs(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]),
+  );
+
+  const asUtc = Date.UTC(
+    Number(values.year),
+    Number(values.month) - 1,
+    Number(values.day),
+    Number(values.hour),
+    Number(values.minute),
+    Number(values.second),
+  );
+
+  return asUtc - date.getTime();
+}
+
+function zonedStartOfDayUtc(year: number, month: number, day: number, timeZone: string) {
+  const localAsUtc = Date.UTC(year, month - 1, day, 0, 0, 0);
+  let offset = timeZoneOffsetMs(new Date(localAsUtc), timeZone);
+  let result = new Date(localAsUtc - offset);
+
+  offset = timeZoneOffsetMs(result, timeZone);
+  result = new Date(localAsUtc - offset);
+
+  return result;
+}
+
 export default async function RiderPortal() {
   const user = await requireRole('RIDER');
+  const riderId = user.riderId;
 
-  if (!user.riderId) {
+  if (!riderId) {
     return (
       <>
         <SessionBar name={user.displayName} role="רוכב / فارس" />
@@ -34,38 +94,200 @@ export default async function RiderPortal() {
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  const [farm, rider, upcoming, completedCount, recentCompleted, progressHistory] = await Promise.all([
-    prisma.farm.findUnique({ where: { id: user.farmId }, select: { name: true, timezone: true } }),
-    prisma.rider.findFirst({ where: { id: user.riderId, farmId: user.farmId }, select: { name: true, phone: true, level: true, notes: true, isActive: true } }),
+  const farm = await prisma.farm.findUnique({
+    where: { id: user.farmId },
+    select: { name: true, timezone: true },
+  });
+
+  const timeZone = farm?.timezone ?? 'Asia/Jerusalem';
+  const localToday = dateParts(now, timeZone);
+
+  const monthStart = zonedStartOfDayUtc(
+    localToday.year,
+    localToday.month,
+    1,
+    timeZone,
+  );
+
+  const nextMonthYear =
+    localToday.month === 12 ? localToday.year + 1 : localToday.year;
+  const nextMonthNumber =
+    localToday.month === 12 ? 1 : localToday.month + 1;
+
+  const nextMonthStart = zonedStartOfDayUtc(
+    nextMonthYear,
+    nextMonthNumber,
+    1,
+    timeZone,
+  );
+
+  const [
+    rider,
+    upcoming,
+    completedCount,
+    recentCompleted,
+    progressHistory,
+    monthActivities,
+  ] = await Promise.all([
+    prisma.rider.findFirst({
+      where: { id: riderId, farmId: user.farmId },
+      select: {
+        name: true,
+        phone: true,
+        level: true,
+        notes: true,
+        isActive: true,
+      },
+    }),
     prisma.lessonParticipant.findMany({
-      where: { riderId: user.riderId, lesson: { farmId: user.farmId, startsAt: { gte: now }, status: { not: 'CANCELLED' } } },
+      where: {
+        riderId,
+        lesson: {
+          farmId: user.farmId,
+          startsAt: { gte: now },
+          status: { not: 'CANCELLED' },
+        },
+      },
       take: 20,
       orderBy: { lesson: { startsAt: 'asc' } },
-      include: { horse: true, lesson: { include: { arena: true, instructor: true } } },
+      include: {
+        horse: true,
+        lesson: { include: { arena: true, instructor: true } },
+      },
     }),
     prisma.lessonParticipant.count({
-      where: { riderId: user.riderId, attendance: 'PRESENT', lesson: { farmId: user.farmId, status: 'COMPLETED', startsAt: { gte: thirtyDaysAgo, lt: now } } },
+      where: {
+        riderId,
+        attendance: 'PRESENT',
+        lesson: {
+          farmId: user.farmId,
+          status: 'COMPLETED',
+          startsAt: { gte: thirtyDaysAgo, lt: now },
+        },
+      },
     }),
     prisma.lessonParticipant.findMany({
-      where: { riderId: user.riderId, lesson: { farmId: user.farmId, status: 'COMPLETED', startsAt: { lt: now } } },
+      where: {
+        riderId,
+        lesson: {
+          farmId: user.farmId,
+          status: 'COMPLETED',
+          startsAt: { lt: now },
+        },
+      },
       take: 5,
       orderBy: { lesson: { startsAt: 'desc' } },
-      include: { horse: true, lesson: { include: { arena: true, instructor: true } } },
+      include: {
+        horse: true,
+        lesson: { include: { arena: true, instructor: true } },
+      },
     }),
     prisma.lessonParticipant.findMany({
-      where: { riderId: user.riderId, progressScore: { not: null }, lesson: { farmId: user.farmId, status: { not: 'CANCELLED' } } },
+      where: {
+        riderId,
+        progressScore: { not: null },
+        lesson: {
+          farmId: user.farmId,
+          status: { not: 'CANCELLED' },
+        },
+      },
       take: 12,
       orderBy: { lesson: { startsAt: 'desc' } },
-      include: { horse: true, lesson: { include: { instructor: true } } },
+      include: {
+        horse: true,
+        lesson: { include: { instructor: true } },
+      },
+    }),
+    prisma.lessonParticipant.findMany({
+      where: {
+        riderId,
+        lesson: {
+          farmId: user.farmId,
+          startsAt: { gte: monthStart, lt: nextMonthStart },
+          status: { not: 'CANCELLED' },
+        },
+      },
+      orderBy: { lesson: { startsAt: 'asc' } },
+      select: {
+        id: true,
+        attendance: true,
+        horse: { select: { name: true } },
+        lesson: {
+          select: {
+            startsAt: true,
+            status: true,
+            notes: true,
+            instructor: { select: { name: true } },
+            arena: { select: { nameHe: true, nameAr: true } },
+          },
+        },
+      },
     }),
   ]);
 
-  const timeZone = farm?.timezone ?? 'Asia/Jerusalem';
+  const activitiesByDay: Record<string, RiderCalendarActivity[]> = {};
+
+  for (const participant of monthActivities) {
+    const localLessonDate = dateParts(participant.lesson.startsAt, timeZone);
+
+    if (
+      localLessonDate.year !== localToday.year ||
+      localLessonDate.month !== localToday.month
+    ) continue;
+
+    const dayKey = String(localLessonDate.day);
+
+    const activity: RiderCalendarActivity = {
+      id: participant.id,
+      time: new Intl.DateTimeFormat('he-IL', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).format(participant.lesson.startsAt),
+      status: participant.lesson.status,
+      arenaHe: participant.lesson.arena.nameHe,
+      arenaAr: participant.lesson.arena.nameAr,
+      instructorName: participant.lesson.instructor.name,
+      horseName: participant.horse.name,
+      notes: participant.lesson.notes,
+      attendance: participant.attendance,
+    };
+
+    (activitiesByDay[dayKey] ??= []).push(activity);
+  }
+
+  const daysInMonth = new Date(
+    Date.UTC(localToday.year, localToday.month, 0),
+  ).getUTCDate();
+
+  const firstWeekDay = new Date(
+    Date.UTC(localToday.year, localToday.month - 1, 1),
+  ).getUTCDay();
+
+  const monthTitleHe = new Intl.DateTimeFormat('he-IL', {
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(now);
+
+  const monthTitleAr = new Intl.DateTimeFormat('ar', {
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(now);
+
   const nextLesson = upcoming[0] ?? null;
   const uniqueUpcomingHorses = new Set(upcoming.map((item) => item.horseId)).size;
-  const scoredProgress = progressHistory.filter((item) => item.progressScore !== null);
+  const scoredProgress = progressHistory.filter(
+    (item) => item.progressScore !== null,
+  );
+
   const averageProgress = scoredProgress.length
-    ? scoredProgress.reduce((sum, item) => sum + (item.progressScore ?? 0), 0) / scoredProgress.length
+    ? scoredProgress.reduce(
+        (sum, item) => sum + (item.progressScore ?? 0),
+        0,
+      ) / scoredProgress.length
     : null;
 
   return (
@@ -79,8 +301,19 @@ export default async function RiderPortal() {
               <h1>שלום {rider?.name ?? user.displayName}</h1>
               <p>כל השיעורים וההתקדמות שלך במקום אחד · دروسك وتقدمك في مكان واحد</p>
             </div>
-            <div className="portal-live-chip"><span /> {rider?.isActive ? 'פעיל / نشط' : 'לא פעיל / غير نشط'}</div>
+            <div className="portal-live-chip">
+              <span /> {rider?.isActive ? 'פעיל / نشط' : 'לא פעיל / غير نشط'}
+            </div>
           </section>
+
+          <RiderMonthCalendar
+            monthTitleHe={monthTitleHe}
+            monthTitleAr={monthTitleAr}
+            daysInMonth={daysInMonth}
+            firstWeekDay={firstWeekDay}
+            today={localToday.day}
+            activitiesByDay={activitiesByDay}
+          />
 
           <section className="portal-stat-grid">
             <article className="portal-stat-card"><span>שיעורים קרובים / دروس قادمة</span><strong>{upcoming.length}</strong><small>מתוכננים עבורך / مخطط لك</small></article>
