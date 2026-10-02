@@ -151,9 +151,9 @@ export function FarmMarketing() {
     ['visit', t.visit],
   ];
   const services = [
-    { Icon: Compass, title: t.western, text: t.westernText },
-    { Icon: HeartHandshake, title: t.therapy, text: t.therapyText },
-    { Icon: Leaf, title: t.arabian, text: t.arabianText },
+    { Icon: Compass, title: t.western, text: t.westernText, image: '/images/ranch/lesson.webp' },
+    { Icon: HeartHandshake, title: t.therapy, text: t.therapyText, image: '/images/ranch/therapy.webp' },
+    { Icon: Leaf, title: t.arabian, text: t.arabianText, image: '/images/ranch/arabian-horses.webp' },
   ];
 
   return (
@@ -213,9 +213,12 @@ export function FarmMarketing() {
 
           <div className="farm-hero-art">
             <div className="farm-hero-glow" />
-            <div className="farm-art-frame">
+            <div className="farm-art-frame farm-art-frame-photo">
               <span className="farm-art-overline">ABU MAJED · ARABIAN HORSES</span>
-              <Image src="/brand/abu-majed-logo.png" width={820} height={580} priority loading="eager" alt={t.horseArt} className="farm-horse-art" style={{ width: '100%', height: 'auto' }} />
+              <div className="farm-hero-photo-wrap">
+                <Image src="/images/ranch/hero.webp" fill priority sizes="(max-width: 700px) 92vw, (max-width: 1100px) 45vw, 560px" alt={t.eyebrow} className="farm-hero-photo" />
+                <span className="farm-photo-logo" aria-hidden="true"><Image src="/brand/abu-majed-logo.png" width={150} height={106} alt="" /></span>
+              </div>
               <div className="farm-art-footer">
                 <div><strong lang="ar">مربط ابو ماجد</strong><small>{t.aboutTag}</small></div>
                 <span className="farm-art-number">01</span>
@@ -245,6 +248,10 @@ export function FarmMarketing() {
             <a href={wa} target="_blank" rel="noopener noreferrer" className="farm-text-link">{t.contact}<ArrowUpLeft size={18} /></a>
           </div>
         </div>
+        <div className="farm-container farm-about-media">
+          <Image src="/images/ranch/facilities.webp" fill sizes="(max-width: 700px) 94vw, 1160px" alt={t.aboutTitle} className="farm-about-photo" />
+          <div className="farm-media-caption"><span>ABU MAJED</span><strong>{t.aboutTag}</strong></div>
+        </div>
         <div className="farm-container farm-about-facts">
           <div><span>01</span><strong>{t.stripOne}</strong></div>
           <div><span>02</span><strong>{t.professional}</strong></div>
@@ -259,8 +266,9 @@ export function FarmMarketing() {
             <p>{t.servicesIntro}</p>
           </div>
           <div className="farm-service-grid">
-            {services.map(({ Icon, title, text }, i) => (
+            {services.map(({ Icon, title, text, image }, i) => (
               <article key={i} className="farm-service">
+                <div className="farm-service-media"><Image src={image} fill sizes="(max-width: 700px) 92vw, 33vw" alt={title} /></div>
                 <div className="farm-service-top">
                   <span className="farm-service-icon"><Icon size={27} strokeWidth={1.5} /></span>
                   <span className="farm-service-index">0{i + 1}</span>
@@ -279,8 +287,9 @@ export function FarmMarketing() {
           <div className="farm-horses-art">
             <span className="farm-horses-orbit farm-horses-orbit-one" />
             <span className="farm-horses-orbit farm-horses-orbit-two" />
-            <div className="farm-horses-logo-card">
-              <Image src="/brand/abu-majed-logo.png" width={820} height={580} alt={t.horseArt} style={{ width: '100%', height: 'auto' }} />
+            <div className="farm-horses-photo-card">
+              <Image src="/images/ranch/horse-portrait.webp" fill sizes="(max-width: 700px) 88vw, 430px" alt={t.horsesTitle} />
+              <span className="farm-horses-badge" aria-hidden="true"><Image src="/brand/abu-majed-logo.png" width={140} height={99} alt="" /></span>
             </div>
           </div>
           <div className="farm-horses-copy">
@@ -299,6 +308,10 @@ export function FarmMarketing() {
           <div className="farm-section-heading farm-visit-heading">
             <h2>{t.visitTitle}</h2>
             <p>{t.visitText}</p>
+          </div>
+          <div className="farm-visit-media">
+            <Image src="/images/ranch/welcome.webp" fill sizes="(max-width: 700px) 94vw, 1160px" alt={t.visitTitle} />
+            <div className="farm-visit-media-overlay"><MapPin size={18} /><span>{t.visitTitle}</span></div>
           </div>
           <div className="farm-contact-grid">
             <article>
