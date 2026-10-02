@@ -110,7 +110,7 @@ export function AdminShell({ children, title, subtitle, userName = 'מנהל ה�
     <div className="admin-app" dir="rtl">
       <aside className="admin-sidebar">
         <Link href="/" className="admin-brand" aria-label="דף הבית">
-          <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.jfif" alt="" /></span>
+          <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.png" alt="" /></span>
           <span className="admin-brand-copy"><strong>{farmName}</strong><small>Horse Farm Management</small></span>
         </Link>
         <NavContent />
@@ -123,7 +123,7 @@ export function AdminShell({ children, title, subtitle, userName = 'מנהל ה�
       <aside className={`admin-mobile-drawer ${open ? 'is-open' : ''}`}>
         <div className="admin-mobile-head">
           <Link href="/" className="admin-brand" onClick={() => setOpen(false)}>
-            <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.jfif" alt="" /></span>
+            <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.png" alt="" /></span>
             <span className="admin-brand-copy"><strong>{farmName}</strong><small>Horse Farm Management</small></span>
           </Link>
           <button className="admin-icon-button" onClick={() => setOpen(false)} aria-label="סגירת תפריט"><X size={21} /></button>

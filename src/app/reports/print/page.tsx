@@ -30,7 +30,7 @@ export default async function ReportsPrintPage({
     <article className={styles.sheet}>
       <header className={styles.header}>
         <div className={styles.brand}>
-          <img src="/brand/abu-majed-logo.jfif" alt="לוגו החווה" />
+          <img src="/brand/abu-majed-logo.png" alt="לוגו החווה" />
           <div><h1>דוח פעילות חווה</h1><p>{farm.name} · تقرير نشاط المربط</p></div>
         </div>
         <div className={styles.period}><strong>{formatDate(data.from, data.timeZone)} — {formatDate(data.to, data.timeZone)}</strong><p>נוצר מתוך מערכת Horse Farm</p></div>

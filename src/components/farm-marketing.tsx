@@ -164,7 +164,7 @@ export function FarmMarketing() {
         <div className="farm-container farm-header-inner">
           <a href="#top" className="farm-wordmark">
             <span className="farm-brand-logo-wrap">
-              <Image src="/brand/abu-majed-logo.jfif" width={70} height={49} alt="" aria-hidden="true" className="farm-brand-logo" style={{ width: '100%', height: '100%' }} loading="eager" />
+              <Image src="/brand/abu-majed-logo.png" width={70} height={49} alt="" aria-hidden="true" className="farm-brand-logo" style={{ width: '100%', height: '100%' }} loading="eager" />
             </span>
             <span className="farm-wordmark-text">
               <span lang="ar">مربط ابو ماجد</span>
@@ -215,7 +215,7 @@ export function FarmMarketing() {
             <div className="farm-hero-glow" />
             <div className="farm-art-frame">
               <span className="farm-art-overline">ABU MAJED · ARABIAN HORSES</span>
-              <Image src="/brand/abu-majed-logo.jfif" width={820} height={580} priority loading="eager" alt={t.horseArt} className="farm-horse-art" style={{ width: '100%', height: 'auto' }} />
+              <Image src="/brand/abu-majed-logo.png" width={820} height={580} priority loading="eager" alt={t.horseArt} className="farm-horse-art" style={{ width: '100%', height: 'auto' }} />
               <div className="farm-art-footer">
                 <div><strong lang="ar">مربط ابو ماجد</strong><small>{t.aboutTag}</small></div>
                 <span className="farm-art-number">01</span>
@@ -280,7 +280,7 @@ export function FarmMarketing() {
             <span className="farm-horses-orbit farm-horses-orbit-one" />
             <span className="farm-horses-orbit farm-horses-orbit-two" />
             <div className="farm-horses-logo-card">
-              <Image src="/brand/abu-majed-logo.jfif" width={820} height={580} alt={t.horseArt} style={{ width: '100%', height: 'auto' }} />
+              <Image src="/brand/abu-majed-logo.png" width={820} height={580} alt={t.horseArt} style={{ width: '100%', height: 'auto' }} />
             </div>
           </div>
           <div className="farm-horses-copy">

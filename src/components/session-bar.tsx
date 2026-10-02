@@ -8,7 +8,7 @@ export function SessionBar({ name, role }: { name: string; role: string }) {
       <div className="portal-topbar-inner">
         <Link href="/" className="portal-brand" aria-label="العودة للصفحة الرئيسية">
           <span className="portal-brand-mark">
-            <img src="/brand/abu-majed-logo.jfif" alt="" />
+            <img src="/brand/abu-majed-logo.png" alt="" />
           </span>
           <span className="portal-brand-copy">
             <strong lang="ar">مربط ابو ماجد</strong>

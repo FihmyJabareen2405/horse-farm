@@ -36,7 +36,7 @@ export function LoginForm({ lang, role }: { lang: 'he' | 'ar'; role: LoginRole }
       <div className="farm-login-shell">
         <aside className="farm-login-brand-panel">
           <div className="farm-login-brand-mark">
-            <Image src="/brand/abu-majed-logo.jfif" alt="مربط ابو ماجد" width={260} height={175} priority />
+            <Image src="/brand/abu-majed-logo.png" alt="مربط ابو ماجد" width={260} height={175} priority />
           </div>
           <div className="farm-login-brand-copy">
             <span>EST. ABU MAJED</span>

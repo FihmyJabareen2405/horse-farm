@@ -63,7 +63,7 @@ export function FarmEntry({ initialLanguage }: { initialLanguage: 'he' | 'ar' })
         <section className="farm-entry-hero">
           <div className="farm-entry-brand">
             <div className="farm-entry-logo-wrap">
-              <Image src="/brand/abu-majed-logo.jfif" alt="مربط ابو ماجد" width={170} height={115} priority />
+              <Image src="/brand/abu-majed-logo.png" alt="مربط ابو ماجد" width={170} height={115} priority />
             </div>
             <div>
               <span className="farm-auth-eyebrow">{t.eyebrow}</span>
