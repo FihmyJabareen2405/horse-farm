@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  INSTRUCTOR
+  RIDER
+}
+
+enum LessonStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  UNMARKED
+  PRESENT
+  ABSENT
+}
+
+enum LessonAuditAction {
+  CREATED
+  UPDATED
+  CANCELLED
+  COMPLETED
+}
+
+enum NotificationType {
+  LESSON_UPCOMING
+  LESSON_CREATED
+  LESSON_UPDATED
+  LESSON_CANCELLED
+  TREATMENT_DUE
+}
+
+model Farm {
+  id          Int          @id @default(autoincrement())
+  name        String
+  timezone    String       @default("Asia/Jerusalem")
+  createdAt   DateTime     @default(now())
+  horses      Horse[]
+  riders      Rider[]
+  instructors Instructor[]
+  arenas      Arena[]
+  lessons     Lesson[]
+  users       User[]
+  notifications Notification[]
+  pushSubscriptions PushSubscription[]
+}
+
+model Horse {
+  id           Int                 @id @default(autoincrement())
+  name         String
+  birthDate    DateTime?           @db.Date
+  breed        String?
+  color        String?
+  gender       String?
+  imageUrl     String?
+  notes        String?
+  isActive     Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  farmId       Int
+  farm         Farm                @relation(fields: [farmId], references: [id])
+  participants LessonParticipant[]
+  treatments   Treatment[]
+
+  @@index([farmId])
+}
+
+model Rider {
+  id           Int                 @id @default(autoincrement())
+  name         String
+  phone        String?
+  level        String?
+  notes        String?
+  isActive     Boolean             @default(true)
+  createdAt    DateTime            @default(now())
+  farmId       Int
+  farm         Farm                @relation(fields: [farmId], references: [id])
+  participants LessonParticipant[]
+  user         User?
+
+  @@index([farmId])
+}
+
+model Instructor {
+  id       Int      @id @default(autoincrement())
+  name     String
+  phone    String?
+  isActive Boolean  @default(true)
+  farmId   Int
+  farm     Farm     @relation(fields: [farmId], references: [id])
+  lessons  Lesson[]
+  user     User?
+
+  @@index([farmId])
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  username     String      @unique
+  displayName  String
+  passwordHash String
+  role         UserRole
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  farmId       Int
+  farm         Farm        @relation(fields: [farmId], references: [id])
+  instructorId Int?        @unique
+  instructor   Instructor? @relation(fields: [instructorId], references: [id])
+  riderId      Int?        @unique
+  rider         Rider?      @relation(fields: [riderId], references: [id])
+  lessonAudits  LessonAudit[]
+  notifications Notification[]
+  pushSubscriptions PushSubscription[]
+  notificationPreference NotificationPreference?
+
+  @@index([farmId, role])
+}
+
+model Notification {
+  id            Int              @id @default(autoincrement())
+  type          NotificationType
+  titleHe       String
+  titleAr       String
+  bodyHe        String?
+  bodyAr        String?
+  href          String?
+  sourceKey     String
+  sourceVersion String
+  readAt        DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  userId        Int
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farmId        Int
+  farm          Farm             @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type, sourceKey])
+  @@index([userId, readAt, createdAt])
+  @@index([farmId, createdAt])
+}
+
+model NotificationPreference {
+  id              Int      @id @default(autoincrement())
+  lessonUpcoming  Boolean  @default(true)
+  lessonCreated   Boolean  @default(true)
+  lessonUpdated   Boolean  @default(true)
+  lessonCancelled Boolean  @default(true)
+  treatmentDue    Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+  userId          Int      @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id             Int      @id @default(autoincrement())
+  deviceKey      String   @unique
+  endpoint       String   @unique
+  p256dh         String
+  auth           String
+  expirationTime BigInt?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farmId         Int
+  farm           Farm     @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
+  @@index([farmId])
+}
+
+model Arena {
+  id       Int      @id @default(autoincrement())
+  code     String
+  nameHe   String
+  nameAr   String
+  isActive Boolean  @default(true)
+  farmId   Int
+  farm     Farm     @relation(fields: [farmId], references: [id])
+  lessons  Lesson[]
+
+  @@unique([farmId, code])
+}
+
+model Lesson {
+  id           Int                 @id @default(autoincrement())
+  startsAt     DateTime            @db.Timestamptz(3)
+  endsAt       DateTime            @db.Timestamptz(3)
+  status       LessonStatus        @default(SCHEDULED)
+  notes        String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  farmId       Int
+  farm         Farm                @relation(fields: [farmId], references: [id])
+  instructorId Int
+  instructor   Instructor          @relation(fields: [instructorId], references: [id])
+  arenaId      Int
+  arena        Arena               @relation(fields: [arenaId], references: [id])
+  participants LessonParticipant[]
+  audits       LessonAudit[]
+
+  @@index([farmId, startsAt])
+  @@index([arenaId, startsAt])
+  @@index([instructorId, startsAt])
+}
+
+model LessonAudit {
+  id            Int               @id @default(autoincrement())
+  action        LessonAuditAction
+  descriptionHe String
+  descriptionAr String
+  createdAt     DateTime          @default(now())
+  lessonId      Int
+  lesson        Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  actorUserId   Int?
+  actor         User?             @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([lessonId, createdAt])
+  @@index([actorUserId])
+}
+
+model LessonParticipant {
+  id             Int              @id @default(autoincrement())
+  lessonId       Int
+  lesson         Lesson           @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  riderId        Int
+  rider          Rider            @relation(fields: [riderId], references: [id])
+  horseId        Int
+  horse          Horse            @relation(fields: [horseId], references: [id])
+  attendance     AttendanceStatus @default(UNMARKED)
+  instructorNote String?
+  progressScore  Int?
+
+  @@unique([lessonId, riderId])
+  @@unique([lessonId, horseId])
+  @@index([riderId])
+  @@index([horseId])
+}
+
+model Treatment {
+  id          Int       @id @default(autoincrement())
+  type        String
+  performedAt DateTime  @db.Date
+  nextDueAt   DateTime? @db.Date
+  provider    String?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  horseId     Int
+  horse       Horse     @relation(fields: [horseId], references: [id])
+
+  @@index([horseId, performedAt])
+}

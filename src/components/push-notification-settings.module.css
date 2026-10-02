@@ -1,0 +1,166 @@
+.card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #e2d9cb;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(202, 166, 106, .12), transparent 32%),
+    linear-gradient(135deg, #ffffff 0%, #fbf8f3 100%);
+  padding: 20px 22px;
+  box-shadow: 0 12px 34px rgba(35, 49, 59, .06);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 4px;
+  background: linear-gradient(#c7a36b, #e4cc9e);
+}
+
+.icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #16334a, #244d64);
+  color: #e6cd9e;
+  box-shadow: 0 10px 22px rgba(23, 53, 76, .16);
+}
+
+.copy {
+  min-width: 0;
+}
+
+.kicker {
+  display: block;
+  margin-bottom: 5px;
+  color: #9a7540;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.title {
+  margin: 0;
+  color: #17354c;
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.text {
+  margin: 5px 0 0;
+  color: #66757d;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.message {
+  margin-top: 10px;
+  border: 1px solid #e7dfd3;
+  border-radius: 11px;
+  background: #f4f0e9;
+  padding: 8px 10px;
+  color: #4c5b61;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.enableButton,
+.disableButton {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 13px;
+  padding: 0 16px;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, opacity .16s ease;
+}
+
+.enableButton {
+  border: 1px solid #17354c;
+  background: #17354c;
+  color: #fff;
+  box-shadow: 0 9px 20px rgba(23, 53, 76, .15);
+}
+
+.enableButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #214860;
+}
+
+.disableButton {
+  border: 1px solid #e5d4cf;
+  background: #fff;
+  color: #914c42;
+}
+
+.disableButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #fbf3f1;
+  border-color: #dbc1ba;
+}
+
+.enableButton:disabled,
+.disableButton:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.spin {
+  animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 720px) {
+  .card {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 12px;
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .title {
+    font-size: 15px;
+  }
+
+  .text {
+    font-size: 11px;
+  }
+
+  .action {
+    grid-column: 1 / -1;
+    justify-content: stretch;
+  }
+
+  .enableButton,
+  .disableButton {
+    width: 100%;
+    min-height: 46px;
+  }
+}

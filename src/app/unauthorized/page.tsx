@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import { requireUser, homeForRole } from '@/lib/auth';
+export default async function UnauthorizedPage(){const user=await requireUser();return <main dir="rtl" className="min-h-screen bg-[#f5f3ee] px-5 py-16"><div className="mx-auto max-w-lg rounded-3xl bg-white p-8 text-center"><h1 className="text-3xl font-bold">אין הרשאה / لا توجد صلاحية</h1><p className="mt-4 text-stone-600">החשבון הזה אינו מורשה לפתוח את המסך המבוקש.<br/>هذا الحساب غير مخول لفتح الصفحة المطلوبة.</p><Link href={homeForRole(user.role)} className="mt-7 inline-block rounded-xl bg-[#243c32] px-6 py-3 text-white">חזרה / عودة</Link></div></main>}
