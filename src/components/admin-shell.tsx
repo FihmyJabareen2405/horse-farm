@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ClipboardList,
   Home,
+  LogOut,
   PawPrint,
   LayoutDashboard,
   Menu,
@@ -73,7 +74,6 @@ function NavContent({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-
 function MobileDock() {
   const pathname = usePathname();
   const items = [
@@ -104,54 +104,148 @@ function MobileDock() {
   );
 }
 
-export function AdminShell({ children, title, subtitle, userName = 'מנהל החווה', farmName = 'مربط ابو ماجد', actions }: AdminShellProps) {
+export function AdminShell({
+  children,
+  title,
+  subtitle,
+  userName = 'מנהל החווה',
+  farmName = 'مربط ابو ماجد',
+  actions,
+}: AdminShellProps) {
   const [open, setOpen] = useState(false);
+
   return (
     <div className="admin-app" dir="rtl">
       <aside className="admin-sidebar">
         <Link href="/" className="admin-brand" aria-label="דף הבית">
-          <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.png" alt="" /></span>
-          <span className="admin-brand-copy"><strong>{farmName}</strong><small>Horse Farm Management</small></span>
+          <span className="admin-brand-mark">
+            <img src="/brand/abu-majed-logo.png" alt="" />
+          </span>
+          <span className="admin-brand-copy">
+            <strong>{farmName}</strong>
+            <small>Horse Farm Management</small>
+          </span>
         </Link>
         <NavContent />
         <div className="admin-sidebar-footer">
-          <Link href="/" className="admin-home-link"><Home size={18} /> <span>האתר הראשי / الرئيسية</span></Link>
+          <Link href="/" className="admin-home-link">
+            <Home size={18} />
+            <span>האתר הראשי / الرئيسية</span>
+          </Link>
         </div>
       </aside>
 
-      {open && <button className="admin-overlay" aria-label="סגירת תפריט" onClick={() => setOpen(false)} />}
+      {open && (
+        <button
+          className="admin-overlay"
+          aria-label="סגירת תפריט"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       <aside className={`admin-mobile-drawer ${open ? 'is-open' : ''}`}>
         <div className="admin-mobile-head">
           <Link href="/" className="admin-brand" onClick={() => setOpen(false)}>
-            <span className="admin-brand-mark"><img src="/brand/abu-majed-logo.png" alt="" /></span>
-            <span className="admin-brand-copy"><strong>{farmName}</strong><small>Horse Farm Management</small></span>
+            <span className="admin-brand-mark">
+              <img src="/brand/abu-majed-logo.png" alt="" />
+            </span>
+            <span className="admin-brand-copy">
+              <strong>{farmName}</strong>
+              <small>Horse Farm Management</small>
+            </span>
           </Link>
-          <button className="admin-icon-button" onClick={() => setOpen(false)} aria-label="סגירת תפריט"><X size={21} /></button>
+          <button
+            className="admin-icon-button"
+            onClick={() => setOpen(false)}
+            aria-label="סגירת תפריט"
+          >
+            <X size={21} />
+          </button>
         </div>
+
         <NavContent onNavigate={() => setOpen(false)} />
+
+        <div
+          style={{
+            marginTop: 'auto',
+            display: 'grid',
+            gap: '8px',
+            paddingTop: '14px',
+            borderTop: '1px solid rgba(255,255,255,.10)',
+          }}
+        >
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="admin-home-link"
+          >
+            <Users size={18} />
+            <span>החלפת משתמש / تبديل المستخدم</span>
+          </Link>
+
+          <form action={logout}>
+            <button
+              type="submit"
+              className="admin-home-link"
+              style={{
+                width: '100%',
+                border: 0,
+                background: 'rgba(255,255,255,.06)',
+                cursor: 'pointer',
+                font: 'inherit',
+                textAlign: 'start',
+              }}
+            >
+              <LogOut size={18} />
+              <span>יציאה / خروج</span>
+            </button>
+          </form>
+        </div>
       </aside>
 
       <div className="admin-main">
         <header className="admin-topbar">
           <div className="admin-topbar-start">
-            <button className="admin-icon-button admin-mobile-menu" onClick={() => setOpen(true)} aria-label="פתיחת תפריט"><Menu size={22} /></button>
+            <button
+              className="admin-icon-button admin-mobile-menu"
+              onClick={() => setOpen(true)}
+              aria-label="פתיחת תפריט"
+            >
+              <Menu size={22} />
+            </button>
             <div className="admin-page-heading">
               {title && <h1>{title}</h1>}
               {subtitle && <p>{subtitle}</p>}
             </div>
           </div>
+
           <div className="admin-topbar-end">
             {actions}
             <NotificationBell />
-            <Link href="/account" className="admin-user-chip" aria-label="החשבון שלי / حسابي">
-              <span className="admin-user-avatar">{userName.trim().charAt(0) || 'מ'}</span>
-              <span><strong>{userName}</strong><small>ADMIN</small></span>
+            <Link
+              href="/account"
+              className="admin-user-chip"
+              aria-label="החשבון שלי / حسابي"
+            >
+              <span className="admin-user-avatar">
+                {userName.trim().charAt(0) || 'מ'}
+              </span>
+              <span>
+                <strong>{userName}</strong>
+                <small>ADMIN</small>
+              </span>
             </Link>
-            <form action={logout}><button className="admin-logout-button" type="submit">יציאה / خروج</button></form>
+            <form action={logout}>
+              <button className="admin-logout-button" type="submit">
+                יציאה / خروج
+              </button>
+            </form>
           </div>
         </header>
+
         <main className="admin-content">{children}</main>
       </div>
+
       <MobileDock />
     </div>
   );
