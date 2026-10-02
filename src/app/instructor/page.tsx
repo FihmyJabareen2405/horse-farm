@@ -2,6 +2,7 @@ import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { SessionBar } from '@/components/session-bar';
 import { completeLesson, saveParticipantProgress, setAttendance } from './actions';
+import { InstructorMonthCalendar, type InstructorCalendarActivity } from './instructor-month-calendar';
 
 function formatDateTime(date: Date, timeZone: string) {
   return new Intl.DateTimeFormat('he-IL', {
@@ -9,6 +10,65 @@ function formatDateTime(date: Date, timeZone: string) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
+}
+
+function dateParts(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]),
+  );
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+  };
+}
+
+function timeZoneOffsetMs(date: Date, timeZone: string) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date);
+
+  const values = Object.fromEntries(
+    parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]),
+  );
+
+  const asUtc = Date.UTC(
+    Number(values.year),
+    Number(values.month) - 1,
+    Number(values.day),
+    Number(values.hour),
+    Number(values.minute),
+    Number(values.second),
+  );
+
+  return asUtc - date.getTime();
+}
+
+function zonedStartOfDayUtc(year: number, month: number, day: number, timeZone: string) {
+  const localAsUtc = Date.UTC(year, month - 1, day, 0, 0, 0);
+  let offset = timeZoneOffsetMs(new Date(localAsUtc), timeZone);
+  let result = new Date(localAsUtc - offset);
+
+  // Re-evaluate once for DST transitions.
+  offset = timeZoneOffsetMs(result, timeZone);
+  result = new Date(localAsUtc - offset);
+
+  return result;
 }
 
 function attendanceLabel(status: 'UNMARKED' | 'PRESENT' | 'ABSENT') {
@@ -23,10 +83,13 @@ function attendanceClass(status: 'UNMARKED' | 'PRESENT' | 'ABSENT') {
   return 'is-unmarked';
 }
 
+
+
 export default async function InstructorPortal() {
   const user = await requireRole('INSTRUCTOR');
+  const instructorId = user.instructorId;
 
-  if (!user.instructorId) {
+  if (!instructorId) {
     return (
       <>
         <SessionBar name={user.displayName} role="מדריך / مدرب" />
@@ -45,22 +108,32 @@ export default async function InstructorPortal() {
   }
 
   const now = new Date();
+
+  const farm = await prisma.farm.findUnique({
+    where: { id: user.farmId },
+    select: { name: true, timezone: true },
+  });
+
+  const timeZone = farm?.timezone ?? 'Asia/Jerusalem';
+  const localToday = dateParts(now, timeZone);
+
+  const monthStart = zonedStartOfDayUtc(localToday.year, localToday.month, 1, timeZone);
+  const nextMonthYear = localToday.month === 12 ? localToday.year + 1 : localToday.year;
+  const nextMonthNumber = localToday.month === 12 ? 1 : localToday.month + 1;
+  const nextMonthStart = zonedStartOfDayUtc(nextMonthYear, nextMonthNumber, 1, timeZone);
+
   const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  const [farm, instructor, upcomingLessons, weekLessons, trackingLessons] = await Promise.all([
-    prisma.farm.findUnique({
-      where: { id: user.farmId },
-      select: { name: true, timezone: true },
-    }),
+  const [instructor, upcomingLessons, weekLessons, trackingLessons, monthLessons] = await Promise.all([
     prisma.instructor.findFirst({
-      where: { id: user.instructorId, farmId: user.farmId },
+      where: { id: instructorId, farmId: user.farmId },
       select: { name: true, phone: true, isActive: true },
     }),
     prisma.lesson.findMany({
       where: {
         farmId: user.farmId,
-        instructorId: user.instructorId,
+        instructorId,
         startsAt: { gte: now },
         status: { not: 'CANCELLED' },
       },
@@ -77,7 +150,7 @@ export default async function InstructorPortal() {
     prisma.lesson.findMany({
       where: {
         farmId: user.farmId,
-        instructorId: user.instructorId,
+        instructorId,
         startsAt: { gte: now, lt: weekEnd },
         status: { not: 'CANCELLED' },
       },
@@ -89,7 +162,7 @@ export default async function InstructorPortal() {
     prisma.lesson.findMany({
       where: {
         farmId: user.farmId,
-        instructorId: user.instructorId,
+        instructorId,
         startsAt: { gte: sevenDaysAgo },
         status: { not: 'CANCELLED' },
       },
@@ -103,11 +176,90 @@ export default async function InstructorPortal() {
         },
       },
     }),
+    prisma.lesson.findMany({
+      where: {
+        farmId: user.farmId,
+        instructorId,
+        startsAt: { gte: monthStart, lt: nextMonthStart },
+        status: { not: 'CANCELLED' },
+      },
+      orderBy: { startsAt: 'asc' },
+      select: {
+        id: true,
+        startsAt: true,
+        status: true,
+        notes: true,
+        arena: { select: { nameHe: true, nameAr: true } },
+        participants: {
+          orderBy: { rider: { name: 'asc' } },
+          select: {
+            id: true,
+            rider: { select: { name: true } },
+            horse: { select: { name: true } },
+          },
+        },
+      },
+    }),
   ]);
 
-  const timeZone = farm?.timezone ?? 'Asia/Jerusalem';
-  const uniqueRiders = new Set(weekLessons.flatMap((lesson) => lesson.participants.map((p) => p.riderId))).size;
-  const uniqueHorses = new Set(weekLessons.flatMap((lesson) => lesson.participants.map((p) => p.horseId))).size;
+  const activitiesByDay: Record<string, InstructorCalendarActivity[]> = {};
+
+  for (const lesson of monthLessons) {
+    const localLessonDate = dateParts(lesson.startsAt, timeZone);
+    if (
+      localLessonDate.year !== localToday.year ||
+      localLessonDate.month !== localToday.month
+    ) continue;
+
+    const dayKey = String(localLessonDate.day);
+    const activity: InstructorCalendarActivity = {
+      id: lesson.id,
+      time: new Intl.DateTimeFormat('he-IL', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).format(lesson.startsAt),
+      status: lesson.status,
+      arenaHe: lesson.arena.nameHe,
+      arenaAr: lesson.arena.nameAr,
+      notes: lesson.notes,
+      participants: lesson.participants.map((participant) => ({
+        id: participant.id,
+        riderName: participant.rider.name,
+        horseName: participant.horse.name,
+      })),
+    };
+
+    (activitiesByDay[dayKey] ??= []).push(activity);
+  }
+
+  const daysInMonth = new Date(
+    Date.UTC(localToday.year, localToday.month, 0),
+  ).getUTCDate();
+
+  const firstWeekDay = new Date(
+    Date.UTC(localToday.year, localToday.month - 1, 1),
+  ).getUTCDay();
+
+  const monthTitleHe = new Intl.DateTimeFormat('he-IL', {
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(now);
+
+  const monthTitleAr = new Intl.DateTimeFormat('ar', {
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(now);
+
+  const uniqueRiders = new Set(
+    weekLessons.flatMap((lesson) => lesson.participants.map((p) => p.riderId)),
+  ).size;
+  const uniqueHorses = new Set(
+    weekLessons.flatMap((lesson) => lesson.participants.map((p) => p.horseId)),
+  ).size;
   const nextLesson = upcomingLessons[0] ?? null;
 
   return (
@@ -121,8 +273,19 @@ export default async function InstructorPortal() {
               <h1>שלום {instructor?.name ?? user.displayName}</h1>
               <p>מרכז העבודה שלך להיום · لوحة عمل المدرب لليوم</p>
             </div>
-            <div className="portal-live-chip"><span /> {instructor?.isActive ? 'פעיל / نشط' : 'לא פעיל / غير نشط'}</div>
+            <div className="portal-live-chip">
+              <span /> {instructor?.isActive ? 'פעיל / نشط' : 'לא פעיל / غير نشط'}
+            </div>
           </section>
+
+          <InstructorMonthCalendar
+            monthTitleHe={monthTitleHe}
+            monthTitleAr={monthTitleAr}
+            daysInMonth={daysInMonth}
+            firstWeekDay={firstWeekDay}
+            today={localToday.day}
+            activitiesByDay={activitiesByDay}
+          />
 
           <section className="portal-stat-grid">
             <article className="portal-stat-card"><span>שיעורים ב־7 ימים / دروس خلال 7 أيام</span><strong>{weekLessons.length}</strong><small>השבוע הקרוב / الأسبوع القادم</small></article>
