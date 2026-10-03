@@ -136,22 +136,18 @@ export function IntroVideoGate(){
    return;
   }
 
-  // iOS does not expose beforeinstallprompt. Give the user the native
-  // "Add to Home Screen" steps instead.
   setInstallHelp(true);
  }
 
  if(!visible)return null;
 
- // Android/Chromium: show only when the browser actually reports that the
- // PWA is installable. iOS: show while not running/known as installed.
  const showInstallButton=mobile&&!installed&&(!!installPrompt||ios);
 
  return <div className={styles.gate} role="dialog" aria-modal="true" aria-label="مربط ابو ماجد / חוות אבו מאג׳ד">
   <video
    ref={videoRef}
    className={styles.video}
-   src={mobile?'/video/abu-majed-intro-mobile.mp4':'/video/abu-majed-intro.mp4'}
+   src="/video/abu-majed-intro.mp4"
    poster="/video/abu-majed-intro-poster.jpg"
    playsInline
    preload="metadata"
