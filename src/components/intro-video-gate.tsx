@@ -159,6 +159,11 @@ export function IntroVideoGate(){
   <div className={`${styles.scrim} ${started?styles.scrimPlaying:''}`} />
 
   {!started&&<div className={styles.entryPanel} dir="rtl">
+   <img
+    src="/brand/abu-majed-logo.png"
+    alt="مربط ابو ماجد / חוות אבו מאג׳ד"
+    className={styles.entryLogo}
+   />
    <span className={styles.eyebrow}>ABU MAJED · ARABIAN HORSES</span>
    <h1><span lang="ar">مربط ابو ماجد</span><span className={styles.divider}>/</span><span lang="he">חוות אבו מאג׳ד</span></h1>
    <p>ברוכים הבאים · أهلاً وسهلاً</p>

@@ -46,6 +46,16 @@
   background: linear-gradient(180deg, rgba(7, 24, 37, .05), rgba(7, 24, 37, .18));
 }
 
+
+.entryLogo {
+  width: clamp(150px, 18vw, 260px);
+  height: auto;
+  max-height: 150px;
+  object-fit: contain;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 10px 26px rgba(0,0,0,.22));
+}
+
 .eyebrow {
   margin-bottom: 14px;
   color: #e1c48f;
@@ -256,6 +266,12 @@
       max(18px, env(safe-area-inset-right))
       calc(34px + env(safe-area-inset-bottom))
       max(18px, env(safe-area-inset-left));
+  }
+
+  .entryLogo {
+    width: min(48vw, 190px);
+    max-height: 110px;
+    margin-bottom: 10px;
   }
 
   .entryPanel h1 { gap: 7px; font-size: 32px; }
