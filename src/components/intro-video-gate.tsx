@@ -160,7 +160,7 @@ export function IntroVideoGate(){
 
   {!started&&<div className={styles.entryPanel} dir="rtl">
    <img
-    src="/brand/abu-majed-logo.png"
+    src="/brand/abu-majed-logo-transparent.png"
     alt="مربط ابو ماجد / חוות אבו מאג׳ד"
     className={styles.entryLogo}
    />

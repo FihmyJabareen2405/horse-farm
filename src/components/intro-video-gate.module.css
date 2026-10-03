@@ -48,12 +48,13 @@
 
 
 .entryLogo {
-  width: clamp(150px, 18vw, 260px);
+  display: block;
+  width: clamp(260px, 31vw, 470px);
   height: auto;
-  max-height: 150px;
+  max-height: 245px;
   object-fit: contain;
-  margin-bottom: 14px;
-  filter: drop-shadow(0 10px 26px rgba(0,0,0,.22));
+  margin: 0 auto 10px;
+  filter: drop-shadow(0 14px 34px rgba(0,0,0,.35));
 }
 
 .eyebrow {
@@ -269,9 +270,9 @@
   }
 
   .entryLogo {
-    width: min(48vw, 190px);
-    max-height: 110px;
-    margin-bottom: 10px;
+    width: min(78vw, 340px);
+    max-height: 190px;
+    margin-bottom: 8px;
   }
 
   .entryPanel h1 { gap: 7px; font-size: 32px; }
