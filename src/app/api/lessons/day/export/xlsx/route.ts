@@ -33,8 +33,12 @@ export async function GET(request: NextRequest) {
 
   if (!farm) return new NextResponse('Farm not found', { status: 404 });
 
+  const farmId = farm.id;
+  const farmName = farm.name;
+  const timeZone = farm.timezone;
+
   const requestedDate = request.nextUrl.searchParams.get('date');
-  const today = localStamp(new Date(), farm.timezone).slice(0, 10);
+  const today = localStamp(new Date(), timeZone).slice(0, 10);
   const day = requestedDate && validDay(requestedDate) ? requestedDate : today;
 
   const instructorFilter = numberFilter(
@@ -43,12 +47,12 @@ export async function GET(request: NextRequest) {
   const arenaFilter = numberFilter(request.nextUrl.searchParams.get('arena'));
   const statusFilter = request.nextUrl.searchParams.get('status') ?? 'active';
 
-  const start = zonedTime(day, '00:00', farm.timezone);
-  const end = zonedTime(moveDay(day, 1), '00:00', farm.timezone);
+  const start = zonedTime(day, '00:00', timeZone);
+  const end = zonedTime(moveDay(day, 1), '00:00', timeZone);
 
   const lessons = await prisma.lesson.findMany({
     where: {
-      farmId: farm.id,
+      farmId,
       startsAt: { lt: end },
       endsAt: { gt: start },
     },
@@ -71,17 +75,20 @@ export async function GET(request: NextRequest) {
     if (arenaFilter && lesson.arenaId !== arenaFilter) return false;
 
     if (statusFilter === 'active' && lesson.status === 'CANCELLED') return false;
+
     if (
       ['SCHEDULED', 'COMPLETED', 'CANCELLED'].includes(statusFilter) &&
       lesson.status !== statusFilter
-    ) return false;
+    ) {
+      return false;
+    }
 
     return true;
   });
 
   function time(value: Date) {
     return new Intl.DateTimeFormat('he-IL', {
-      timeZone: farm.timezone,
+      timeZone,
       hour: '2-digit',
       minute: '2-digit',
       hourCycle: 'h23',
@@ -132,7 +139,7 @@ export async function GET(request: NextRequest) {
       name: 'Summary',
       rows: [
         ['מדד / البيان', 'ערך / القيمة'],
-        ['חווה / المربط', farm.name],
+        ['חווה / المربط', farmName],
         ['תאריך / التاريخ', day],
         ['מספר שיעורים / عدد الدروس', filtered.length],
         ['מספר שיבוצי רוכבים / عدد الفرسان', participantCount],
